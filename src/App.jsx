@@ -1,11 +1,16 @@
 //I used reactbits to get my dynamic background https://reactbits.dev/backgrounds/color-bends
-import "./index.css";
+import { useState } from "react";
 import ColorBends from "./components/ColorBends";
-import TextType from './components/TextType';
+import TextType from "./components/TextType";
+import ChatBox from "./components/ChatBox"; 
+import "./index.css";
+
 function App() {
+  const [showChat, setShowChat] = useState(false); // controls page switch
+
   return (
     <div className="app-container">
-      {/* Animated background */}
+      {/* Background stays the same */}
       <div className="Background">
         <ColorBends
           colors={["#ff5c7a", "#ffff14ff", "#0044ffff"]}
@@ -20,21 +25,27 @@ function App() {
         />
       </div>
 
-      {/* Centered content */}
-      <div className="app-content">
-        <TextType 
-          text={["Chat with our AI assistant."]}
-          typingSpeed={75}
-          pauseDuration={1500}
-          showCursor={true}
-          cursorCharacter="|"
-        />
+      {/* Landing Page */}
+      {!showChat ? (
+        <div className="app-content">
+          <TextType
+            text={["Chat with our AI assistant."]}
+            typingSpeed={75}
+            pauseDuration={1500}
+            showCursor={true}
+            cursorCharacter="|"
+          />
 
-        <div className="button-group">
-          <button className="hover-border">Chat Now</button>
-          <button className="hover-border dark">Learn More</button>
+          <div className="button-group">
+            <button className="hover-border" onClick={() => setShowChat(true)}>
+              Chat Now
+            </button>
+            <button className="hover-border dark">Learn More</button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <ChatBox onBack={() => setShowChat(false)} />
+      )}
     </div>
   );
 }
