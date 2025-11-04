@@ -24,24 +24,45 @@ body {
   overflow: hidden;
 }
 
-/* Centered hero box */
-.app-content {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.foreground {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 200px; /* ⬆️ more vertical space */
+  padding-top: 1px; /* optional fine-tuning */
+}
+
+
+/* Big heading */
+.heading-section {
   text-align: center;
-  width: 100%;
-  max-width: 600px;
-  padding: 20px;
-  
+  margin-bottom: 10px;
 }
 
 .text-type {
+  font-size: 2.5rem; /* make it large */
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.5px;
   display: inline-block;
+}
+
+
+.text-type {
+  /* display: inline-block;
   white-space: pre-wrap;
-  margin-bottom: 40px;
+  margin-bottom: 40px; */
+  font-size: 4rem;
+  font-weight: 600;
+  color: #fff;
+  z-index: 2;
+  position: relative;
+  margin-bottom: 400px;
 }
 
 .text-type__cursor {
@@ -55,60 +76,16 @@ body {
 }
 
 
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-
-.hover-border {
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 600;
-  color: black;
-  background: white;
-  border: 2px solid transparent;
-  border-radius: 50px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.hover-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50px;
-  border: 2px solid white;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.hover-border:hover::before {
-  opacity: 1;
-}
-
-.hover-border:hover {
-  transform: translateY(-3px);
-}
-
-
-.hover-border.dark {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
 /* Floating glass-like chat container */
 .chat-container {
   position: absolute;
   z-index: 1;
-  top: 50%;
+  top: 60%;
   left: 50%;
+  max-height: 200vh;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 520px;
+  max-width: 820px;
   background: rgba(20, 20, 20, 0.55); /* translucent black */
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
@@ -196,20 +173,4 @@ body {
   text-align: center;
   font-style: italic;
   color: rgba(255, 255, 255, 0.6);
-}
-
-/* Back button */
-.back-btn {
-  align-self: center;
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white;
-  transition: 0.3s;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
 }

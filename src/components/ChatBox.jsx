@@ -1,62 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
-function ChatBox({ onBack }) {
+function ChatBox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const chatEndRef = useRef(null); // 👈 for auto scroll
 
-
-  const handleSend = async () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
-
-    const userMessage = { sender: "user", text: input };
+    const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
 
     // Mock AI response for now
     setTimeout(() => {
-      const aiMessage = {
-        sender: "ai",
+      const aiResponse = {
         text: `🤖 AI says: "${userMessage.text}" sounds interesting!`,
+        sender: "ai",
       };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, aiResponse]);
       setLoading(false);
     }, 1000);
   };
 
+  // 👇 Automatically scroll to bottom when new message appears
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <div className="chat-container">
-      <h1>AI Chat 💬</h1>
       <div className="chat-box">
-        {messages.length === 0 && (
-          <p className="placeholder">Start chatting with your AI assistant!</p>
-        )}
-
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`chat-message ${msg.sender === "user" ? "user" : "ai"}`}
-          >
+        {messages.map((msg, index) => (
+          <div key={index} className={`chat-message ${msg.sender}`}>
             {msg.text}
           </div>
         ))}
-        {loading && <p className="loading">AI is typing...</p>}
+        {loading && <p className="loading">Thinking...</p>}
+        <div ref={chatEndRef} /> {/* invisible marker for scroll */}
       </div>
 
       <div className="chat-input">
         <input
           type="text"
+          placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
-        <button onClick={handleSend}>Send</button>
+        <button onClick={sendMessage}>Send</button>
       </div>
-
-      <button className="hover-border dark back-btn" onClick={onBack}>
-        ← Back
-      </button>
     </div>
   );
 }

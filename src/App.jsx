@@ -2,15 +2,13 @@
 import { useState } from "react";
 import ColorBends from "./components/ColorBends";
 import TextType from "./components/TextType";
-import ChatBox from "./components/ChatBox"; 
+import ChatBox from "./components/ChatBox";
 import "./index.css";
 
 function App() {
-  const [showChat, setShowChat] = useState(false); // controls page switch
-
   return (
     <div className="app-container">
-      {/* Background stays the same */}
+      {/* Background animation */}
       <div className="Background">
         <ColorBends
           colors={["#ff5c7a", "#ffff14ff", "#0044ffff"]}
@@ -25,27 +23,23 @@ function App() {
         />
       </div>
 
-      {/* Landing Page */}
-      {!showChat ? (
-        <div className="app-content">
+      {/* Foreground content */}
+      <div className="foreground">
+        {/* Big heading — outside chat container */}
+        <div className="heading-section">
           <TextType
             text={["Chat with our AI assistant."]}
             typingSpeed={75}
             pauseDuration={1500}
             showCursor={true}
             cursorCharacter="|"
+            startOnVisible={false}
           />
-
-          <div className="button-group">
-            <button className="hover-border" onClick={() => setShowChat(true)}>
-              Chat Now
-            </button>
-            <button className="hover-border dark">Learn More</button>
-          </div>
         </div>
-      ) : (
-        <ChatBox onBack={() => setShowChat(false)} />
-      )}
+
+        {/* Floating chat box */}
+        <ChatBox />
+      </div>
     </div>
   );
 }
