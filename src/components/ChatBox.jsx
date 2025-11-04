@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
+import { askGemini } from "../api/gemini";
 
 function ChatBox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const chatEndRef = useRef(null); // 👈 for auto scroll
+  const chatEndRef = useRef(null);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -13,18 +14,14 @@ function ChatBox() {
     setInput("");
     setLoading(true);
 
-    // Mock AI response for now
-    setTimeout(() => {
-      const aiResponse = {
-        text: `🤖 AI says: "${userMessage.text}" sounds interesting!`,
-        sender: "ai",
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-      setLoading(false);
-    }, 1000);
+    // 🔥 Call Gemini API
+    const aiText = await askGemini(input);
+
+    const aiResponse = { text: aiText, sender: "ai" };
+    setMessages((prev) => [...prev, aiResponse]);
+    setLoading(false);
   };
 
-  // 👇 Automatically scroll to bottom when new message appears
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -38,7 +35,7 @@ function ChatBox() {
           </div>
         ))}
         {loading && <p className="loading">Thinking...</p>}
-        <div ref={chatEndRef} /> {/* invisible marker for scroll */}
+        <div ref={chatEndRef} />
       </div>
 
       <div className="chat-input">
