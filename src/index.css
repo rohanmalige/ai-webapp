@@ -1,3 +1,27 @@
+.heading-section {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  margin: 0;
+  text-align: center;
+  pointer-events: none;   /* ⬅️ important */
+}
+
+/* Remove the move/fade that hid the heading */
+.chat-active .heading-section {
+  transform: translateX(-50%); /* keep centered, no vertical shift */
+  opacity: 1;
+}
+
+/* Optional: tighten type spacing a bit */
+.text-type {
+  margin-bottom: 0;         /* no large bottom gap anymore */
+  font-size: 3rem;          /* adjust if you want it smaller/larger */
+}
+
+
 /* Base layout */
 body {
   margin: 0;
@@ -24,6 +48,32 @@ body {
   overflow: hidden;
 }
 
+/* Floating glass-like chat container */
+.chat-container {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 820px;
+
+  height: var(--chat-h, 280px); /* starts small */
+  max-height: 60vh;             /* hard cap */
+  transition: height 0.35s ease;
+
+  background: rgba(20, 20, 20, 0.55);
+  backdrop-filter: blur(18px) saturate(180%);
+  border-radius: 20px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* keep rounded corners clean */
+}
+
 .foreground {
   position: relative;
   z-index: 2;
@@ -36,21 +86,6 @@ body {
   padding-top: 1px; /* optional fine-tuning */
 }
 
-
-/* Big heading */
-.heading-section {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.text-type {
-  font-size: 2.5rem; /* make it large */
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
-  letter-spacing: 0.5px;
-  display: inline-block;
-}
 
 
 .text-type {
@@ -76,67 +111,86 @@ body {
 }
 
 
-/* Floating glass-like chat container */
-.chat-container {
-  position: absolute;
-  z-index: 1;
-  top: 60%;
-  left: 50%;
-  max-height: 200vh;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 820px;
-  background: rgba(20, 20, 20, 0.55); /* translucent black */
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-radius: 20px;
-  padding: 25px;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  transition: all 0.4s ease;
-}
 
-/* Chat scroll area */
+/* chat messages area: make it flex-grow and scrollable */
 .chat-box {
   flex: 1;
-  max-height: 320px;
+  min-height: 0;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.05); /* soft contrast */
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 10px;
-  scroll-behavior: smooth;
+  padding: 72px 15px 15px;        /* toggled to hidden by JS if not needed */
 }
 
-/* Message bubbles */
+/* Common message container */
 .chat-message {
-  padding: 10px 14px;
-  border-radius: 16px;
-  margin: 6px 0;
-  max-width: 80%;
-  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  line-height: 1.45;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-.chat-message.user {
-  background: linear-gradient(135deg, #007bff, #0060df);
-  color: #fff;
-  align-self: flex-end;
-}
-
+/* AI message alignment (left) */
 .chat-message.ai {
+  justify-content: flex-start;
+}
+
+/* User message alignment (right) */
+.chat-message.user {
+  justify-content: flex-end;
+}
+
+/* Bubble base — main fix here */
+.bubble {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  max-width: 70%; /* ✅ tighten horizontally */
+}
+
+/* AI bubble (left) */
+.chat-message.ai .bubble {
   background: rgba(255, 255, 255, 0.1);
   color: #e4e4e4;
-  align-self: flex-start;
+  border-radius: 18px 18px 18px 4px;
 }
+
+/* User bubble (right) */
+.chat-message.user .bubble {
+  background: linear-gradient(135deg, #007bff, #005ce6);
+  color: #fff;
+  border-radius: 18px 18px 4px 18px;
+}
+
+/* ✅ Ensure long paragraphs wrap correctly */
+.bubble p {
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.icon {
+  font-size: 1.3rem;
+  margin-top: 4px;
+}
+
+/* Smooth fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 
 /* Input area */
 .chat-input {
   display: flex;
   gap: 10px;
+  margin-bottom: 4px;
+  margin-left: 5px;
 }
 
 .chat-input input {
@@ -160,8 +214,9 @@ body {
   color: white;
   border: none;
   border-radius: 10px;
-  cursor: pointer;
   transition: 0.3s;
+  margin-right: 5px;
+  margin-bottom: 2px;
 }
 
 .chat-input button:hover {
@@ -173,4 +228,111 @@ body {
   text-align: center;
   font-style: italic;
   color: rgba(255, 255, 255, 0.6);
+}
+.side-controls {
+  position: fixed;
+  top: 55%;                         /* aligns roughly with chat's vertical center */
+  left: calc(50% + 460px);          /* 50% = viewport center, + (chat half width + padding) */
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9;                        /* above background, below heading */
+}
+
+.clear-btn {
+  align-self: flex-end;
+  margin: 10px 16px 0 0;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.clear-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.history-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.history-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Modal overlay */
+.history-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Inner content box */
+.history-content {
+  background: rgba(20, 20, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 25px;
+  width: 85%;
+  max-width: 600px;
+  max-height: 75vh;
+  overflow-y: auto;
+  color: white;
+  backdrop-filter: blur(12px);
+}
+
+.history-item {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.history-item.user {
+  color: #70a8ff;
+}
+
+.close-history {
+  margin-top: 16px;
+  background: #007bff;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close-history:hover {
+  background: #3390ff;
+}
+@media (max-width: 1100px) {
+  .side-controls {
+    top: 84px;                      /* below the heading */
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 820px;               /* match chat width */
+    gap: 10px;
+  }
 }

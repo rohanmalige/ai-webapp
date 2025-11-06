@@ -11,7 +11,7 @@ function App() {
       {/* Background animation */}
       <div className="Background">
         <ColorBends
-          colors={["#ff5c7a", "#ffff14ff", "#0044ffff"]}
+          colors={["#f6002dff", "#ffff00ff", "#002487ff","#610489ff"]}
           rotation={45}
           speed={0.3}
           scale={1.2}
@@ -24,8 +24,8 @@ function App() {
       </div>
 
       {/* Foreground content */}
-      <div className="foreground">
-        {/* Big heading — outside chat container */}
+      <div className="foreground chat-active">
+
         <div className="heading-section">
           <TextType
             text={["Chat with our AI assistant."]}
