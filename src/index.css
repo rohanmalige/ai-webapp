@@ -1,12 +1,13 @@
 .heading-section {
   position: fixed;
-  top: 24px;
+  top: 34px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   margin: 0;
   text-align: center;
   pointer-events: none;   /* ⬅️ important */
+  
 }
 
 /* Remove the move/fade that hid the heading */
@@ -57,11 +58,12 @@ body {
   width: 100%;
   max-width: 820px;
 
-  height: var(--chat-h, 280px); /* starts small */
+  /*height: var(--chat-h, 280px);  starts small */
   max-height: 60vh;             /* hard cap */
   transition: height 0.35s ease;
 
   background: rgba(20, 20, 20, 0.55);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
   border-radius: 20px;
   color: #fff;
@@ -157,6 +159,7 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: #e4e4e4;
   border-radius: 18px 18px 18px 4px;
+  margin-top: 10px;
 }
 
 /* User bubble (right) */
@@ -164,13 +167,14 @@ body {
   background: linear-gradient(135deg, #007bff, #005ce6);
   color: #fff;
   border-radius: 18px 18px 4px 18px;
+  margin-top: 10px;
 }
 
 /* ✅ Ensure long paragraphs wrap correctly */
 .bubble p {
   margin: 0;
   word-break: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .icon {
@@ -242,31 +246,31 @@ body {
 
 .clear-btn {
   align-self: flex-end;
-  margin: 10px 16px 0 0;
+  margin: 15px 20px 0 0;
   padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 2, 2, 0.894);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-  backdrop-filter: blur(6px);
+  /* backdrop-filter: blur(6px); */
 }
 
 .clear-btn:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 .history-btn {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(2, 255, 225, 0.838);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   border-radius: 10px;
-  padding: 6px 14px;
+  padding: 6px 10px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-  backdrop-filter: blur(6px);
+  /* backdrop-filter: blur(6px); */
 }
 
 .history-btn:hover {
@@ -298,6 +302,7 @@ body {
   max-height: 75vh;
   overflow-y: auto;
   color: white;
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 

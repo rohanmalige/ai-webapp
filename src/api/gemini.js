@@ -11,6 +11,6 @@ export async function askGemini(prompt) {
     return text;
   } catch (err) {
     console.error("Gemini error:", err);
-    return "Sorry, something went wrong. Please try again!";
+    throw err;
   }
 }

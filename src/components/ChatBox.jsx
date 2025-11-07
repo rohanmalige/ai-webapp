@@ -13,11 +13,14 @@ function ChatBox() {
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
   const [showHistory, setShowHistory] = useState(false);
-
+  const [savedHistory, setSavedHistory] = useState([]);
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const inputRowRef = useRef(null);
-  const MIN = 280;                            // px (start size)
+  const EMPTY_MIN = 180;  // initial/empty height
+  const ACTIVE_MIN = 280;
+  const [chatHeight, setChatHeight] = useState(180); 
+  const PADDING = 30;               
   const MAX = typeof window !== "undefined" ? window.innerHeight * 0.70 : 600;
 
   const sendMessage = async () => {
@@ -29,12 +32,12 @@ function ChatBox() {
 
     let aiIndex;
     setMessages((prev) => {
-      const updated = [...prev, { text: "", sender: "ai" }];
+      const updated = [...prev, { text: "", sender: "ai"}];
       aiIndex = updated.length - 1;
       return updated;
     });
 
-
+    try{
     const reply = await askGemini(input);
 
     setMessages((prev) => {
@@ -42,14 +45,27 @@ function ChatBox() {
       if (updated[aiIndex]) updated[aiIndex].text = reply;
       return updated;
     });
-
-    setLoading(false);
+    } catch (err) {
+      setMessages(prev => {
+        const updated = [...prev];
+      if (updated[aiIndex]) {
+        updated[aiIndex] = { sender: "ai", text: "Sorry, something went wrong. Please try again." };
+      }
+      return updated;
+    });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const clearChat = () => {
     setMessages([]);
-    // next tick after state clears, force reset to MIN
-    setTimeout(() => applyAutoHeight(true), 0);
+    // force collapse to empty size
+    //setTimeout(() => applyAutoHeight(true), 0);
+    //requestAnimationFrame(() => applyAutoHeight(true));
+    setChatHeight(EMPTY_MIN);  // hard collapse
+    if (listRef.current) listRef.current.style.overflowY = "hidden";
+
   };
 
   useEffect(() => {
@@ -59,7 +75,7 @@ function ChatBox() {
   // Load saved history on mount
   const openHistory = () => {
     const saved = localStorage.getItem("chatHistory");
-    if (saved) setMessages(JSON.parse(saved));
+    setSavedHistory(saved ? JSON.parse(saved) : []);
     setShowHistory(true);
   };
 
@@ -71,29 +87,34 @@ function ChatBox() {
   }, [messages]);
 
 
-  const applyAutoHeight = (force=false) => {
+  const applyAutoHeight = (force = false) => {
     const box = listRef.current;
     const inputRow = inputRowRef.current;
     const container = containerRef.current;
     if (!box || !inputRow || !container) return;
 
-    const PADDING = 30;
-    const natural = box.scrollHeight + inputRow.offsetHeight + PADDING;
-    const clamped = Math.max(MIN, Math.min(natural, MAX));
 
-    // Only grow when the last message is a *non-empty* AI reply,
-    // or when we're forcing (e.g., on mount/clear)
+    const natural = box.scrollHeight + inputRow.offsetHeight + PADDING;
+    const clampedActive = Math.max(
+      ACTIVE_MIN,
+      Math.min(natural, MAX)
+    );
+
     const last = messages[messages.length - 1];
-    const aiJustResponded =
-      last && last.sender === "ai" && last.text && last.text.trim().length > 0;
+    const aiJustResponded = last && last.sender === "ai" && last.text && last.text.trim().length > 0;
+
+    if (messages.length === 0) {
+      // const collapsed = Math.max(EMPTY_MIN, inputRow.offsetHeight + PADDING);
+      // setChatHeight(collapsed);                 // <-- set state
+      // if (listRef.current) listRef.current.style.overflowY = "hidden";
+      return;
+    }
+
+    // has messages
 
     if (force || aiJustResponded) {
-      container.style.setProperty("--chat-h", `${clamped}px`);
-      box.style.overflowY = natural > clamped ? "auto" : "hidden";
-    } else if (messages.length === 0) {
-      // brand-new state: snap back to min
-      container.style.setProperty("--chat-h", `${MIN}px`);
-      box.style.overflowY = "hidden";
+      setChatHeight(clampedActive);             // <-- state drives height
+      box.style.overflowY = natural > clampedActive ? "auto" : "hidden";
     }
   };
 
@@ -110,11 +131,12 @@ function ChatBox() {
     <div className="chat-wrapper">
       <div className="side-controls">
         <button className="clear-btn" onClick={clearChat}>Clear Chat</button>
-        <button className="history-btn" onClick={() => setShowHistory(true)}>🕓 History</button>
+        <button className="history-btn" onClick={openHistory}>🕓 History</button>
       </div>
 
       {/* bind ref here */}
-      <div className="chat-container" ref={containerRef}>
+
+      <div className="chat-container" ref={containerRef} style={{ height: `${chatHeight}px` }}>
         {/* list ref */}
         <div className="chat-box" ref={listRef}>
           {messages.map((msg, i) => (
@@ -144,7 +166,8 @@ function ChatBox() {
             placeholder="Type your message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            //onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onKeyDown={(e) => !loading && e.key === "Enter" && sendMessage()}
           />
           <button onClick={sendMessage} disabled={loading}>
             {loading ? "..." : "Send"}
@@ -156,9 +179,11 @@ function ChatBox() {
         <div className="history-modal">
           <div className="history-content">
             <h3>Chat History</h3>
-            {messages.length === 0 ? <p>No past conversations.</p> : (
+            {(!savedHistory || savedHistory.length === 0) ? (
+              <p>No past conversations.</p>
+            ) : (
               <div className="history-list">
-                {messages.map((msg, i) => (
+                {savedHistory.map((msg, i) => (
                   <div key={i} className={`history-item ${msg.sender}`}>
                     <strong>{msg.sender === "ai" ? "🤖 AI:" : "🧍You:"}</strong> {msg.text}
                   </div>
