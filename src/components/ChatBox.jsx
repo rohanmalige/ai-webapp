@@ -17,7 +17,7 @@ function ChatBox() {
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const inputRowRef = useRef(null);
-  const EMPTY_MIN = 180;  // initial/empty height
+  const EMPTY_MIN = 180;  // initial empty height
   const ACTIVE_MIN = 280;
   const [chatHeight, setChatHeight] = useState(180); 
   const PADDING = 30;               
@@ -60,9 +60,6 @@ function ChatBox() {
 
   const clearChat = () => {
     setMessages([]);
-    // force collapse to empty size
-    //setTimeout(() => applyAutoHeight(true), 0);
-    //requestAnimationFrame(() => applyAutoHeight(true));
     setChatHeight(EMPTY_MIN);  // hard collapse
     if (listRef.current) listRef.current.style.overflowY = "hidden";
 
@@ -104,16 +101,13 @@ function ChatBox() {
     const aiJustResponded = last && last.sender === "ai" && last.text && last.text.trim().length > 0;
 
     if (messages.length === 0) {
-      // const collapsed = Math.max(EMPTY_MIN, inputRow.offsetHeight + PADDING);
-      // setChatHeight(collapsed);                 // <-- set state
-      // if (listRef.current) listRef.current.style.overflowY = "hidden";
       return;
     }
 
     // has messages
 
     if (force || aiJustResponded) {
-      setChatHeight(clampedActive);             // <-- state drives height
+      setChatHeight(clampedActive);            
       box.style.overflowY = natural > clampedActive ? "auto" : "hidden";
     }
   };
@@ -130,14 +124,25 @@ function ChatBox() {
   return (
     <div className="chat-wrapper">
       <div className="side-controls">
-        <button className="clear-btn" onClick={clearChat}>Clear Chat</button>
-        <button className="history-btn" onClick={openHistory}>🕓 History</button>
+        <button type="button" className="neon-btn neon-btn--red" onClick={clearChat}>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        Clear Chat
+        </button>
+        <button type="button" className="neon-btn neon-btn--green" onClick={openHistory}>  
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        🕓 History
+        </button>
       </div>
 
-      {/* bind ref here */}
 
       <div className="chat-container" ref={containerRef} style={{ height: `${chatHeight}px` }}>
-        {/* list ref */}
+
         <div className="chat-box" ref={listRef}>
           {messages.map((msg, i) => (
             <div key={i} className={`chat-message ${msg.sender}`}>
@@ -159,7 +164,7 @@ function ChatBox() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* input row ref */}
+
         <div className="chat-input" ref={inputRowRef}>
           <input
             type="text"
