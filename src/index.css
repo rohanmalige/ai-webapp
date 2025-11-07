@@ -1,3 +1,4 @@
+/* I used https://prismic.io/blog/css-button-animations#15-hover-glow-effect for glow effect buttons*/
 /*font for the buttons */
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap");
 
@@ -423,4 +424,5 @@ body {
 .side-controls .neon-btn {
   margin: 10px 0;
 }
+
 

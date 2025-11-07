@@ -59,22 +59,53 @@ function ChatBox() {
   };
 
   const clearChat = () => {
+    if (messages.length) {
+    const sessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+    sessions.push({ ts: Date.now(), messages }); // save finished session
+    localStorage.setItem("chatSessions", JSON.stringify(sessions));
+    }
     setMessages([]);
     setChatHeight(EMPTY_MIN);  // hard collapse
     if (listRef.current) listRef.current.style.overflowY = "hidden";
 
   };
-
+  const MarkdownMessage = ({ text }) => (
+    <ReactMarkdown
+      components={{
+        code({ inline, className, children, ...props }) {
+          return inline
+            ? <code className="md-inline-code" {...props}>{children}</code>
+            : <pre className="md-code"><code {...props}>{children}</code></pre>;
+        }
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  );
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Load saved history on mount
   const openHistory = () => {
-    const saved = localStorage.getItem("chatHistory");
-    setSavedHistory(saved ? JSON.parse(saved) : []);
+  if (messages.length) {
+    setSavedHistory(messages);
     setShowHistory(true);
-  };
+    return;
+  }
+
+  const live = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+  if (live.length) {
+    setSavedHistory(live);
+    setShowHistory(true);
+    return;
+  }
+
+  const sessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+  const last = sessions.at(-1)?.messages || [];
+  setSavedHistory(last);
+  setShowHistory(true);
+};
 
   // Save whenever messages update
   useEffect(() => {
@@ -190,7 +221,10 @@ function ChatBox() {
               <div className="history-list">
                 {savedHistory.map((msg, i) => (
                   <div key={i} className={`history-item ${msg.sender}`}>
-                    <strong>{msg.sender === "ai" ? "🤖 AI:" : "🧍You:"}</strong> {msg.text}
+                    <strong>{msg.sender === "ai" ? "🤖 AI:" : "You:"}</strong>
+                      <div className="history-bubble">
+                      <MarkdownMessage text={msg.text} />
+                    </div>
                   </div>
                 ))}
               </div>

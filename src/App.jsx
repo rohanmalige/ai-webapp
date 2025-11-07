@@ -1,4 +1,5 @@
 //I used reactbits to get my dynamic background https://reactbits.dev/backgrounds/color-bends
+
 import { useState } from "react";
 import ColorBends from "./components/ColorBends";
 import TextType from "./components/TextType";
