@@ -1,16 +1,131 @@
-# React + Vite
+# AI Chat Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight React app that lets users enter a prompt, sends it to an AI API (Gemini), and displays the response with loading and error states. Includes a local chat history and a clean, animated UI.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+* Prompt input + submit button
+* Fetch from AI API (Google Gemini via `@google/generative-ai`)
+* Dynamic results display (stream-like placeholder + Markdown rendering)
+* Loading state (spinner from `ldrs`)
+* Error handling (graceful fallback message)
+* Show chat history (localStorage) and Clear button
+* Polish: Animated background, auto-resizing chat container
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **React** (Vite)
+* **Google Gemini** (`@google/generative-ai`)
+* **React Markdown** (`react-markdown`)
+* **Loader** (`ldrs`)
+* **Three.js** (animated background)
+
+---
+
+## Quick Start
+
+### 1) Clone & install
+
+```bash
+git clone <your-repo-url>
+cd <your-repo>
+npm install
+```
+
+### 2) Add your API key
+
+Create a `.env` file in the project root:
+
+Edit `.env` and set:
+
+```env
+VITE_API_KEY=YOUR_GOOGLE_GEMINI_API_KEY
+```
+
+> **Note:** Please add the .env file to .gitignore to prevent exposing your API Key.
+
+### 3) Run the dev server
+
+```bash
+npm run dev
+```
+
+Vite will print a local URL (**Example**: [http://localhost:5174](http://localhost:5174)).
+
+### 4) Build for production
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+---
+
+## Project Structure
+
+```
+src/
+  api/
+    gemini.js        # askGemini(prompt) → string (handles errors)
+  components/
+    ChatBox.jsx      # chat UI, loading/error states, history, clear chat implementation
+    ColorBends.jsx   # animated background (Three.js shader)
+    TextType.jsx     # typing heading animation
+  App.jsx
+  index.css          # global styles (glassmorphism, layout)
+```
+
+---
+
+## Configuration
+
+* API client: `src/api/gemini.js`
+
+  * Uses `VITE_API_KEY` from `.env`
+  * Model: `gemini-2.5-flash` (adjust if needed)
+* History: `localStorage` key: `chatHistory`
+* Loading: `ldrs` spinner (leapfrog)
+* Markdown: `react-markdown` to render AI replies
+
+---
+
+## Manual Test Checklist
+
+* Type a prompt → **Send** → see **spinner**, then **AI reply**
+* Bad/empty key → shows **error fallback** (“Sorry, something went wrong…”)
+* **Enter** key sends (disabled while loading)
+* **Clear Chat** collapses the box to a smaller height
+* **History** button shows last saved messages (if any)
+
+---
+
+## Environment & Security
+
+* Never commit `.env` (already gitignored).
+* Use separate keys for dev/prod.
+* Rate limits/errors are surfaced as user-friendly messages.
+
+---
+
+## Troubleshooting
+
+* **Blank response or 401**: Check `VITE_API_KEY` and that the Gemini API is enabled for your project.
+* **CORS issues**: Ensure you’re using the official client; Vite dev server should proxy fine locally.
+* **Build fails**: Delete `node_modules` and lockfile, then reinstall.
+
+---
+
+## 📄 License
+
+MIT License
+
+---
